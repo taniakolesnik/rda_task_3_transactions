@@ -12,8 +12,10 @@ SET @product_id = (
 SET @customer_id = 1;
 SET @count = 1;
 
--- Start the transaction 
-START TRANSACTION; 
+INSERT INTO Orders (`CustomerID`, `Date`)
+select @customer_id, '2023-01-01';
+
+SET @order_id = LAST_INSERT_ID();
 
 SET @current_count = (
   SELECT WarehouseAmount
@@ -21,10 +23,8 @@ SET @current_count = (
   WHERE ID = @product_id
 );
 
-INSERT INTO Orders (`CustomerID`, `Date`)
-select @customer_id, '2023-01-01' where @current_count >= @count;;
-
-SET @order_id = LAST_INSERT_ID();
+-- Start the transaction 
+START TRANSACTION; 
 
 INSERT INTO OrderItems (OrderID, ProductID, Count) 
 	SELECT @order_id, @product_id, @count 
