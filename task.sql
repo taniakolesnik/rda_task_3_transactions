@@ -15,26 +15,26 @@ SET @count = 1;
 -- Start the transaction 
 START TRANSACTION; 
 
-INSERT INTO Orders (`CustomerID`, `Date`)
-VALUES ( @customer_id, '2023-01-01');
-
-SET @order_id = LAST_INSERT_ID();
-
 SET @current_count = (
   SELECT WarehouseAmount
   FROM Products
   WHERE ID = @product_id
 );
 
+INSERT INTO Orders (`CustomerID`, `Date`)
+select @customer_id, '2023-01-01' where @current_count >= @count;;
+
+SET @order_id = LAST_INSERT_ID();
+
 INSERT INTO OrderItems (OrderID, ProductID, Count) 
 	SELECT @order_id, @product_id, @count 
-	WHERE @current_count > @count;
+	WHERE @current_count >= @count;
 
 SELECT @current_count, @count, @current_count > @count;
 
 UPDATE Products 
 	SET WarehouseAmount = WarehouseAmount - @count
-	WHERE ID = @product_id AND WarehouseAmount > @count;
+	WHERE ID = @product_id AND WarehouseAmount >= @count;
 
 -- And some data should be created inside the transaction 
 
